@@ -1,64 +1,61 @@
 class Product:
-    def __init__(self, name, price, quantity):
-        # Sicherheits-Check: Verhindert, dass fehlerhafte Daten im System gespeichert werden.
-        if name == "" or price < 0 or quantity < 0:
-            raise ValueError("Ungültige Werte für das Produkt!")
+    """Represents a product in the store with stock and price management."""
 
-        # Speichern der geprüften Parameter in den Instanzvariablen des Objekts.
-        self.name = name
-        self.price = price
-        self.quantity = quantity
-        # Ein neu angelegtes Produkt ist standardmäßig aktiv.
+    def __init__(self, name: str, price: float, quantity: int):
+        """Initializes a new product with strict validation rules."""
+        if not name or not str(name).strip():
+            raise ValueError("Invalid name: cannot be empty or only whitespace.")
+        if price < 0 or quantity < 0:
+            raise ValueError("Invalid price or quantity: cannot be negative.")
+
+        self.name = str(name).strip()
+        self.price = float(price)
+        self.quantity = int(quantity)
         self.active = True
 
-    def __str__(self):
-        # Diese Methode sorgt dafür, dass 'print(produkt)' einen schönen Text ausgibt.
+    def __str__(self) -> str:
+        """Returns a formatted string containing product details."""
         return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
 
-    # Gibt den aktuell gespeicherten Bestand an den Aufrufer zurück.
-    def get_quantity(self):
+    def get_quantity(self) -> int:
+        """Returns the current stock quantity."""
         return self.quantity
 
-    # Überschreibt den Bestand mit einem neuen Wert und steuert den Aktivitätsstatus.
-    def set_quantity(self, quantity):
-        # 1. Den neuen Wert in der Instanzvariable speichern.
+    def set_quantity(self, quantity: int):
+        """Updates the stock quantity and deactivates if stock reaches zero."""
         self.quantity = quantity
-
-        # 2. Automatische Deaktivierung, falls der Bestand auf 0 fällt.
-        if self.quantity == 0:
+        if self.quantity <= 0:
             self.active = False
 
-    # Gibt den aktuellen Aktivitätsstatus (True oder False) zurück.
-    def is_active(self):
+    def is_active(self) -> bool:
+        """Returns True if the product is active, False otherwise."""
         return self.active
 
-    # Schaltet das Produkt manuell auf aktiv.
     def activate(self):
+        """Activates the product manually."""
         self.active = True
 
-    # Schaltet das Produkt manuell auf inaktiv.
     def deactivate(self):
+        """Deactivates the product manually."""
         self.active = False
 
-    # Baut die Produktdaten zu einem formatierten String zusammen und gibt diesen aus.
     def show(self):
-        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
+        """Prints the formatted product details to the console."""
+        print(self.__str__())
 
-    # Führt den Kaufvorgang durch, aktualisiert den Bestand und berechnet den Preis.
-    def buy(self, quantity):
-        # Abbruch und Fehlermeldung, falls mehr angefragt wird, als auf Lager ist.
+    def buy(self, quantity: int) -> float:
+        """Processes a purchase, updates stock, and returns the total price."""
+        if quantity <= 0:
+            raise ValueError("Quantity to buy must be greater than zero.")
+        if not self.active:
+            raise ValueError(f"Product '{self.name}' is currently inactive.")
         if quantity > self.quantity:
-            raise ValueError("Nicht genug auf Lager!")
+            raise ValueError(f"Not enough stock for '{self.name}'.")
 
-        # Berechnung des Gesamtpreises für die angefragte Menge.
         total_price = quantity * self.price
-
-        # Aktualisierung des Bestands. Wir nutzen hier die eigene set_quantity-Methode,
-        # damit die automatische Prüfung auf Bestand == 0 direkt mit ausgeführt wird.
         self.set_quantity(self.quantity - quantity)
-
-        # Rückgabe des berechneten Preises an das Hauptprogramm.
         return total_price
+
 
 if __name__ == "__main__":
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
